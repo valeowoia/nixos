@@ -1,22 +1,22 @@
+# Edit this configuration file to define what should be installed on
+# your system.  Help is available in the configuration.nix(5) man page
+# and in the NixOS manual (accessible by running ‘nixos-help’).
+
 { config, pkgs, ... }:
 
 {
-  imports = [
+  imports =
+    [
       ./hardware-configuration.nix
     ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.extraModulePackages = with config.boot.kernelPackages; [
-    evdi
-  ];
-  boot.initrd.luks.devices."luks-bdf625e6-c015-45cc-8c43-4d78d2124567".device = "/dev/disk/by-uuid/bdf625e6-c015-45cc-8c43-4d78d2124567";
-  networking.hostName = "harumi";
+
+  networking.hostName = "kaede";
 
   networking.networkmanager.enable = true;
-
   time.timeZone = "Europe/Warsaw";
-
   i18n.defaultLocale = "en_US.UTF-8";
 
   i18n.extraLocaleSettings = {
@@ -30,91 +30,89 @@
     LC_TELEPHONE = "pl_PL.UTF-8";
     LC_TIME = "pl_PL.UTF-8";
   };
-  sound.enable = true;
-  
-  services = {
-    xserver = {
-      layout = "us";
-      xkbVariant = "";
-      videoDrivers = [ "displaylink" "modesetting" ];
-      enable = true;
-      windowManager.i3 = {
-        enable = true;
-    };
-    desktopManager = {
-      xterm.enable = false;
-    };
-    displayManager = {
-      lightdm.enable = true;
-      defaultSession = "none+i3";
-    };
-  };
-    gvfs.enable = true;
-    gnome.gnome-keyring.enable = true;
-    blueman.enable = true;
-    pipewire = {
-      enable = true;
-      pulse.enable = true;
-    };
-  };
 
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-      pulseaudio = true;
-    };
+  services.xserver.enable = true;
+  services.xserver.displayManager.sddm.enable = true;
+  services.xserver.desktopManager.plasma5.enable = true;
+  services.xserver = {
+    xkb.layout = "us";
+    xkb.variant = "";
+    videoDrivers = [ "displaylink" "modesetting" ];
+  };
+  services.gvfs.enable = true;
+  services.printing.enable = true;
+  sound.enable = true;
+  hardware.pulseaudio.enable = false;
+  hardware.bluetooth.enable = true; # enables support for Bluetooth
+  hardware.bluetooth.powerOnBoot = true; # powers up the default Bluetooth controller on boot
+  security.rtkit.enable = true;
+  services.blueman.enable = true;
+
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
   };
 
   users.users.valeowoia = {
     isNormalUser = true;
-    description = "User Name";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [];
+    description = "Valerie Sireneva";
+    extraGroups = [ "networkmanager" "wheel" "vboxusers"];
+    packages = with pkgs; [
+      kate
+    ];
   };
 
+
+  
+  virtualisation.virtualbox.host.enable = true;
+  users.extraGroups.vboxusers.members = [ "valeowoia" ];
+  virtualisation.virtualbox.host.enableExtensionPack = true;
+
+  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.allowUnsecure = true;
+
   environment.systemPackages = with pkgs; [
-  kitty
-  dmenu
-  git
-  gnome.gnome-keyring
   nerdfonts
-  networkmanagerapplet
   pulseaudioFull
-  rofi
   vim
   unzip
   fastfetch
-  polybarFull
   vscode
-  rofi
   flameshot
   chromium
   telegram-desktop
-  i3-rounded
-  i3lock-fancy
-  i3lock-color
-  xss-lock
-  lxappearance
-  gnome.nautilus
-  feh
-  xorg.xev
   bitwarden
-  picom-next
   spotify
-  spicetify-cli
   acpi
-  brightnessctl
+  wget
+  pritunl-client
+  obs-studio
+  filezilla
+  element-desktop
+  ghidra
+  git
+  gradle
+  obs-studio
+  qrencode
+  rocketchat-desktop
+  anydesk
+  dtc
+  gparted
+  kicad
+  noto-fonts-color-emoji
+  screen
+  stlink
+  wev
+  yubikey-manager-qt
+  yubikey-personalization-gui
+  tmux
+  minicom
+  virtualbox
+  steam
+  jetbrains.webstorm
   ];
-
-  programs = {
-    thunar.enable = true;
-    dconf.enable = true;
-  };
-
-
-  hardware = {
-    bluetooth.enable = true;
-  };
 
   system.stateVersion = "23.11";
 
